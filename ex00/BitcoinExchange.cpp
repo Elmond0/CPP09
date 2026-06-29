@@ -76,7 +76,6 @@ bool parseValue(const std::string& str, float& out)
 	return true;
 }
 
-// ----- database -------------------------------------------------------------
 
 void BitcoinExchange::loadDatabase(const std::string& path)
 {
