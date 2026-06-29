@@ -5,9 +5,6 @@
 # include <deque>
 # include <string>
 
-// Sorts a sequence of positive integers using the Ford-Johnson
-// (merge-insertion) algorithm. The algorithm is implemented twice, once on a
-// std::vector and once on a std::deque, so we can compare their timings.
 class PmergeMe
 {
 	public:
@@ -16,11 +13,7 @@ class PmergeMe
 		PmergeMe& operator=(const PmergeMe& other);
 		~PmergeMe();
 
-		// Parses argv into the internal containers.
-		// Throws std::invalid_argument on any non positive-integer token.
 		void parse(int argc, char** argv);
-
-		// Runs both sorts, printing the before/after sequences and timings.
 		void run();
 
 	private:

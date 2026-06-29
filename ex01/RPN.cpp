@@ -23,7 +23,6 @@ static bool isOperator(char c)
 
 void RPN::applyOperator(char op)
 {
-	// We need two operands; the second one popped is the left side.
 	if (_stack.size() < 2)
 		throw std::runtime_error("not enough operands.");
 
@@ -49,7 +48,6 @@ void RPN::applyOperator(char op)
 
 int RPN::evaluate(const std::string& expression)
 {
-	// Clear any leftover state so the object can be reused.
 	while (!_stack.empty())
 		_stack.pop();
 
@@ -62,7 +60,6 @@ int RPN::evaluate(const std::string& expression)
 
 		if (std::isdigit(static_cast<unsigned char>(c)))
 		{
-			// Subject guarantees single-digit operands (< 10).
 			_stack.push(c - '0');
 		}
 		else if (isOperator(c))
@@ -74,8 +71,6 @@ int RPN::evaluate(const std::string& expression)
 			throw std::runtime_error("invalid token.");
 		}
 	}
-
-	// A well-formed expression leaves exactly one value on the stack.
 	if (_stack.size() != 1)
 		throw std::runtime_error("malformed expression.");
 

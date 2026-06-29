@@ -20,9 +20,6 @@ BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other)
 
 BitcoinExchange::~BitcoinExchange() {}
 
-// ----- small parsing helpers ------------------------------------------------
-
-// Trims spaces and tabs from both ends of a string (in place via copy).
 static std::string trim(const std::string& s)
 {
 	std::string::size_type start = s.find_first_not_of(" \t");
@@ -32,7 +29,6 @@ static std::string trim(const std::string& s)
 	return s.substr(start, end - start + 1);
 }
 
-// Checks that every character in [begin, end) of s is a digit.
 static bool allDigits(const std::string& s, size_t begin, size_t end)
 {
 	for (size_t i = begin; i < end; ++i)
@@ -41,7 +37,6 @@ static bool allDigits(const std::string& s, size_t begin, size_t end)
 	return true;
 }
 
-// True for years divisible by 4, except centuries that aren't divisible by 400.
 static bool isLeapYear(int year)
 {
 	return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
@@ -49,7 +44,6 @@ static bool isLeapYear(int year)
 
 bool isValidDate(const std::string& date)
 {
-	// Expected layout: YYYY-MM-DD (exactly 10 characters).
 	if (date.size() != 10 || date[4] != '-' || date[7] != '-')
 		return false;
 	if (!allDigits(date, 0, 4) || !allDigits(date, 5, 7) || !allDigits(date, 8, 10))
@@ -61,7 +55,6 @@ bool isValidDate(const std::string& date)
 	if (month < 1 || month > 12 || day < 1)
 		return false;
 
-	// Reject impossible days like 2011-02-31, accounting for leap years.
 	const int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	int maxDay = daysInMonth[month - 1];
 	if (month == 2 && isLeapYear(year))
@@ -74,9 +67,6 @@ bool parseValue(const std::string& str, float& out)
 	if (str.empty())
 		return false;
 
-	// Reject anything that is not a plain number (no extra characters, no
-	// thousands separators, no trailing letters). strtod handles the parse,
-	// then we make sure it consumed the whole string.
 	char* end = 0;
 	double value = std::strtod(str.c_str(), &end);
 	if (*end != '\0')
@@ -95,7 +85,7 @@ void BitcoinExchange::loadDatabase(const std::string& path)
 		throw std::runtime_error("could not open database file.");
 
 	std::string line;
-	std::getline(file, line); // skip the "date,exchange_rate" header
+	std::getline(file, line);
 
 	while (std::getline(file, line))
 	{
@@ -116,21 +106,15 @@ void BitcoinExchange::loadDatabase(const std::string& path)
 
 float BitcoinExchange::getRate(const std::string& date) const
 {
-	// lower_bound gives the first entry >= date.
 	std::map<std::string, float>::const_iterator it = _rates.lower_bound(date);
 
-	// Exact match.
 	if (it != _rates.end() && it->first == date)
 		return it->second;
-
-	// Otherwise we need the closest *earlier* date: step back one.
 	if (it == _rates.begin())
 		throw std::out_of_range("no earlier date in database.");
 	--it;
 	return it->second;
 }
-
-// ----- input processing -----------------------------------------------------
 
 void BitcoinExchange::processInput(const std::string& path) const
 {
@@ -139,7 +123,7 @@ void BitcoinExchange::processInput(const std::string& path) const
 		throw std::runtime_error("could not open file.");
 
 	std::string line;
-	std::getline(file, line); // skip the "date | value" header
+	std::getline(file, line);
 
 	while (std::getline(file, line))
 	{
